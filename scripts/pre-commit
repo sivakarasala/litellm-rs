@@ -17,4 +17,12 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+echo "Updating sqlx offline cache..."
+cargo sqlx prepare -- --features ssr
+if [ $? -ne 0 ]; then
+    echo "cargo sqlx prepare failed. Is DATABASE_URL set and the database running?"
+    exit 1
+fi
+git add .sqlx/
+
 echo "Pre-commit checks passed."

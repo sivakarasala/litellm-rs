@@ -1,6 +1,9 @@
 #![recursion_limit = "1024"]
 
 pub mod app;
+#[cfg(feature = "ssr")]
+pub mod audit;
+pub mod auth;
 pub mod components;
 #[cfg(feature = "ssr")]
 pub mod configuration;

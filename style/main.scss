@@ -30,6 +30,8 @@ $shadow-md:    0 4px 6px rgba(0,0,0,0.07);
 $font-sans:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 $font-mono:    'JetBrains Mono', 'Fira Code', monospace;
 
+$sidebar-width: 240px;
+
 // Reset
 *, *::before, *::after {
     box-sizing: border-box;
@@ -49,21 +51,275 @@ html {
 body {
     min-height: 100vh;
     background: $surface;
+    display: flex;
 }
 
-// Login page placeholder
-.login-page {
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+// Loading screen
+.loading-screen {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    gap: 1rem;
+    width: 100%;
+    color: $text-muted;
+    font-size: 0.875rem;
+}
 
-    h1 {
-        font-size: 2rem;
+// ─── Layout ───
+
+.main-content {
+    margin-left: $sidebar-width;
+    flex: 1;
+    min-height: 100vh;
+    padding: 2rem;
+    background: $surface;
+}
+
+.main-content--full {
+    flex: 1;
+    min-height: 100vh;
+}
+
+// ─── Sidebar ───
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: $sidebar-width;
+    height: 100vh;
+    background: $bg;
+    border-right: 1px solid $border;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+
+    &__logo {
+        padding: 1.25rem 1.5rem;
+        font-size: 1.125rem;
         font-weight: 700;
         color: $accent;
+        border-bottom: 1px solid $border-light;
+    }
+
+    &__nav {
+        flex: 1;
+        padding: 0.75rem 0;
+        overflow-y: auto;
+    }
+
+    &__link {
+        display: block;
+        padding: 0.625rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: $text-secondary;
+        transition: background 0.15s, color 0.15s;
+
+        &:hover {
+            background: $surface;
+            color: $text-primary;
+        }
+
+        &.active {
+            color: $accent;
+            background: $accent-light;
+            border-right: 2px solid $accent;
+        }
+    }
+
+    &__footer {
+        border-top: 1px solid $border-light;
+        padding: 1rem 1.5rem;
+    }
+
+    &__user {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        margin-bottom: 0.75rem;
+    }
+
+    &__avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: $accent-light;
+        color: $accent;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    &__email {
+        font-size: 0.8125rem;
+        color: $text-secondary;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__logout {
+        width: 100%;
+        padding: 0.5rem;
+        background: none;
+        border: 1px solid $border;
+        border-radius: $radius-sm;
+        font-size: 0.8125rem;
+        color: $text-secondary;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+
+        &:hover {
+            background: $danger-bg;
+            color: $danger;
+            border-color: $danger;
+        }
+    }
+}
+
+// ─── Login Page ───
+
+.login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    background: $surface;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    background: $bg;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    padding: 2.5rem 2rem;
+    box-shadow: $shadow-md;
+}
+
+.login-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $accent;
+    text-align: center;
+    margin-bottom: 0.25rem;
+}
+
+.login-subtitle {
+    font-size: 0.875rem;
+    color: $text-muted;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.login-error {
+    background: $danger-bg;
+    color: $danger;
+    padding: 0.625rem 0.875rem;
+    border-radius: $radius-sm;
+    font-size: 0.8125rem;
+    margin-bottom: 1rem;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    input {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid $border;
+        border-radius: $radius-sm;
+        font-size: 0.875rem;
+        font-family: $font-sans;
+        color: $text-primary;
+        background: $bg;
+        transition: border-color 0.15s;
+        outline: none;
+
+        &:focus {
+            border-color: $accent;
+            box-shadow: 0 0 0 3px rgba($accent, 0.1);
+        }
+
+        &::placeholder {
+            color: $text-muted;
+        }
+    }
+}
+
+.auth-submit {
+    width: 100%;
+    padding: 0.625rem;
+    background: $accent;
+    color: white;
+    border: none;
+    border-radius: $radius-sm;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: $font-sans;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover:not(:disabled) {
+        background: $accent-hover;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    &--success {
+        background: $success;
+    }
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.8125rem;
+    color: $text-secondary;
+}
+
+.auth-link {
+    background: none;
+    border: none;
+    color: $accent;
+    font-size: 0.8125rem;
+    font-family: $font-sans;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+        color: $accent-hover;
+    }
+}
+
+// ─── Dashboard (placeholder) ───
+
+.dashboard-page {
+    h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
     }
 
     p {
