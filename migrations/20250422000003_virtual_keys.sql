@@ -1,0 +1,26 @@
+CREATE TABLE virtual_keys (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key_hash TEXT NOT NULL UNIQUE,
+    key_prefix TEXT NOT NULL,
+    name TEXT NOT NULL,
+    provider_key_id UUID NOT NULL REFERENCES provider_keys(id),
+    user_name TEXT,
+    user_email TEXT,
+    team TEXT,
+    metadata JSONB,
+    allowed_models TEXT[],
+    max_budget_usd NUMERIC(10,4),
+    budget_reset_period TEXT CHECK (budget_reset_period IN ('daily', 'monthly') OR budget_reset_period IS NULL),
+    rpm_limit INTEGER,
+    tpm_limit INTEGER,
+    log_prompts BOOLEAN NOT NULL DEFAULT false,
+    cache_enabled BOOLEAN NOT NULL DEFAULT false,
+    cache_ttl_seconds INTEGER NOT NULL DEFAULT 3600,
+    spend_alert_threshold NUMERIC(3,2),
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    expires_at TIMESTAMPTZ,
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_virtual_keys_key_hash ON virtual_keys (key_hash);
