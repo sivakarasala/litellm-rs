@@ -12,6 +12,7 @@ async fn main() {
     use litellm_rs::routes::{health_check, ApiDoc};
     use litellm_rs::telemetry::{get_subscriber, init_subscriber};
     use sqlx::postgres::PgPoolOptions;
+    use tower_http::cors::{Any, CorsLayer};
     use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
     use tower_http::trace::TraceLayer;
     use tower_sessions::cookie::SameSite;
@@ -76,7 +77,13 @@ async fn main() {
             "/embeddings",
             axum::routing::post(litellm_rs::proxy::embeddings::embeddings),
         )
-        .route("/models", get(litellm_rs::proxy::models::list_models));
+        .route("/models", get(litellm_rs::proxy::models::list_models))
+        .layer(
+            CorsLayer::new()
+                .allow_origin(Any)
+                .allow_methods(Any)
+                .allow_headers(Any),
+        );
 
     let app = Router::new()
         .nest("/v1", proxy_routes)
