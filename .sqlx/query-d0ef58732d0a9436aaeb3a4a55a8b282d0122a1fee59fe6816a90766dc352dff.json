@@ -1,0 +1,50 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, action, target_type, target_id, details, created_at\n           FROM audit_log\n           ORDER BY created_at DESC\n           LIMIT 100",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "action",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "target_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "target_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "details",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "d0ef58732d0a9436aaeb3a4a55a8b282d0122a1fee59fe6816a90766dc352dff"
+}

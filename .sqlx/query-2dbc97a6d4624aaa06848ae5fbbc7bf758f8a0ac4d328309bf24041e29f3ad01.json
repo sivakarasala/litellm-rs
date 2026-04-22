@@ -1,0 +1,80 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, model, endpoint, input_tokens, output_tokens, total_tokens,\n                  cost_usd::text as \"cost!: String\", cached, status_code, latency_ms, created_at\n           FROM usage_logs\n           ORDER BY created_at DESC\n           LIMIT 100",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "model",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "endpoint",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "input_tokens",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "output_tokens",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "total_tokens",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "cost!: String",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "cached",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "status_code",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "latency_ms",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 10,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "2dbc97a6d4624aaa06848ae5fbbc7bf758f8a0ac4d328309bf24041e29f3ad01"
+}

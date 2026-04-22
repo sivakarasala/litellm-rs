@@ -1,5 +1,7 @@
 use crate::auth::{get_me, AuthUser, Logout};
-use crate::pages::{DashboardPage, KeysPage, LoginPage, RequestTokenPage, SettingsPage};
+use crate::pages::{
+    AuditPage, DashboardPage, KeysPage, LoginPage, RequestTokenPage, SettingsPage, UsagePage,
+};
 use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
 use leptos_router::{
@@ -57,6 +59,8 @@ pub fn App() -> impl IntoView {
                                 <Routes fallback=|| "Page not found.".into_view()>
                                     <Route path=StaticSegment("login") view=LoginPage/>
                                     <Route path=StaticSegment("keys") view=KeysPage/>
+                                    <Route path=StaticSegment("usage") view=UsagePage/>
+                                    <Route path=StaticSegment("audit") view=AuditPage/>
                                     <Route path=StaticSegment("request-token") view=RequestTokenPage/>
                                     <Route path=StaticSegment("settings") view=SettingsPage/>
                                     <Route path=StaticSegment("") view=move || {

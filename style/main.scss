@@ -313,18 +313,65 @@ a {
     }
 }
 
-// ─── Dashboard (placeholder) ───
+// ─── Dashboard ───
 
 .dashboard-page {
-    h1 {
-        font-size: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.stat-card {
+    background: $bg;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    padding: 1.25rem 1.5rem;
+    box-shadow: $shadow-sm;
+
+    &__value {
+        font-size: 1.75rem;
         font-weight: 700;
-        margin-bottom: 0.5rem;
+        color: $text-primary;
+        margin-bottom: 0.25rem;
     }
 
-    p {
-        color: $text-secondary;
+    &__label {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: $text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
     }
+}
+
+.dashboard-section {
+    h2 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+}
+
+// ─── Usage Page ───
+
+.usage-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+// ─── Audit Page ───
+
+.audit-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 // ─── Page Layout ───
