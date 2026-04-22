@@ -1,4 +1,7 @@
+#[cfg(feature = "ssr")]
+use crate::error::AppError;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 #[cfg(feature = "ssr")]
 static POOL: std::sync::OnceLock<sqlx::PgPool> = std::sync::OnceLock::new();
@@ -10,15 +13,66 @@ pub fn init_pool(pool: sqlx::PgPool) {
 }
 
 #[cfg(feature = "ssr")]
-pub async fn db() -> Result<sqlx::PgPool, leptos::prelude::ServerFnError> {
+pub async fn db() -> Result<sqlx::PgPool, AppError> {
     leptos::prelude::use_context::<sqlx::PgPool>()
         .or_else(|| POOL.get().cloned())
-        .ok_or_else(|| leptos::prelude::ServerFnError::new("Database pool not initialized"))
+        .ok_or_else(|| AppError::Internal("Database pool not initialized".into()))
+}
+
+// ---- Newtypes ----
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct UserId(String);
+
+impl UserId {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+#[cfg(feature = "ssr")]
+impl UserId {
+    pub fn from_uuid(id: uuid::Uuid) -> Self {
+        Self(id.to_string())
+    }
+
+    pub fn as_uuid(&self) -> Result<uuid::Uuid, AppError> {
+        self.0
+            .parse()
+            .map_err(|_| AppError::Internal("Invalid user ID format".into()))
+    }
+}
+
+impl fmt::Display for UserId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Email(String);
+
+impl Email {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+
+    /// Construct from a trusted source (e.g., database row) without re-validating.
+    #[cfg(feature = "ssr")]
+    pub fn from_trusted(email: String) -> Self {
+        Self(email)
+    }
+}
+
+impl fmt::Display for Email {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
 }
 
 // ---- Models ----
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub enum UserRole {
     #[serde(rename = "viewer")]
     Viewer,
@@ -59,13 +113,4 @@ impl sqlx::Encode<'_, sqlx::Postgres> for UserRole {
         };
         <&str as sqlx::Encode<sqlx::Postgres>>::encode(s, buf)
     }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[cfg_attr(feature = "ssr", derive(sqlx::FromRow))]
-pub struct User {
-    pub id: String,
-    pub email: String,
-    pub display_name: String,
-    pub role: UserRole,
 }

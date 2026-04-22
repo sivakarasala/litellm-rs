@@ -109,7 +109,7 @@ fn Sidebar(user: AuthUser) -> impl IntoView {
             <div class="sidebar__footer">
                 <div class="sidebar__user">
                     <span class="sidebar__avatar">{user.initials()}</span>
-                    <span class="sidebar__email">{user.email}</span>
+                    <span class="sidebar__email">{user.email.to_string()}</span>
                 </div>
                 <ActionForm action=logout>
                     <button type="submit" class="sidebar__logout">"Sign out"</button>

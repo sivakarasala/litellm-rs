@@ -8,6 +8,7 @@ pub mod components;
 #[cfg(feature = "ssr")]
 pub mod configuration;
 pub mod db;
+pub mod error;
 pub mod pages;
 #[cfg(feature = "ssr")]
 pub mod routes;

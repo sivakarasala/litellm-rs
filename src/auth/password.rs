@@ -1,3 +1,7 @@
+#[cfg(feature = "ssr")]
+use crate::db::UserId;
+#[cfg(feature = "ssr")]
+use crate::error::AppError;
 use leptos::prelude::*;
 
 #[server]
@@ -12,7 +16,7 @@ pub async fn login_with_password(email: String, password: String) -> Result<(), 
     )
     .fetch_optional(&pool)
     .await
-    .map_err(|e| ServerFnError::new(e.to_string()))?;
+    .map_err(|e| AppError::Internal(e.to_string()))?;
 
     let row = match row {
         Some(r) => r,
@@ -27,12 +31,12 @@ pub async fn login_with_password(email: String, password: String) -> Result<(), 
                 None,
             )
             .await;
-            return Err(ServerFnError::new("Invalid email or password"));
+            return Err(AppError::InvalidCredentials.into());
         }
     };
 
     let parsed =
-        PasswordHash::new(&row.password_hash).map_err(|e| ServerFnError::new(e.to_string()))?;
+        PasswordHash::new(&row.password_hash).map_err(|e| AppError::Internal(e.to_string()))?;
 
     if Argon2::default()
         .verify_password(password.as_bytes(), &parsed)
@@ -48,11 +52,12 @@ pub async fn login_with_password(email: String, password: String) -> Result<(), 
             None,
         )
         .await;
-        return Err(ServerFnError::new("Invalid email or password"));
+        return Err(AppError::InvalidCredentials.into());
     }
 
+    let user_id = UserId::from_uuid(row.id);
     let session = super::session::get_session().await?;
-    super::session::set_user_id(&session, &row.id.to_string()).await?;
+    super::session::set_user_id(&session, &user_id).await?;
 
     crate::audit::log_audit(
         &pool,
@@ -86,33 +91,29 @@ pub async fn register_with_password(
     let hash = hash_password(&password)?;
     let role = default_role_for_new_user(&pool).await?;
 
-    let role_enum: crate::db::UserRole = if role == "admin" {
-        crate::db::UserRole::Admin
-    } else {
-        crate::db::UserRole::Viewer
-    };
     let rec = sqlx::query!(
         r#"INSERT INTO users (email, display_name, password_hash, role)
            VALUES (LOWER($1), $2, $3, $4)
            RETURNING id"#,
-        email,
+        email.as_str(),
         name,
         hash,
-        role_enum as crate::db::UserRole
+        role as crate::db::UserRole
     )
     .fetch_one(&pool)
     .await
     .map_err(|e| {
         let msg = e.to_string();
         if msg.contains("unique") || msg.contains("duplicate") {
-            ServerFnError::new("An account with this email already exists")
+            AppError::DuplicateEmail
         } else {
-            ServerFnError::new("Failed to create account")
+            AppError::Internal("Failed to create account".into())
         }
     })?;
 
+    let user_id = UserId::from_uuid(rec.id);
     let session = super::session::get_session().await?;
-    super::session::set_user_id(&session, &rec.id.to_string()).await?;
+    super::session::set_user_id(&session, &user_id).await?;
 
     crate::audit::log_audit(
         &pool,
@@ -120,7 +121,7 @@ pub async fn register_with_password(
         "auth.register",
         Some("user"),
         Some(&rec.id.to_string()),
-        Some(serde_json::json!({"role": role})),
+        Some(serde_json::json!({"role": format!("{:?}", role)})),
         None,
     )
     .await;

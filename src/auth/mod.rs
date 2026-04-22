@@ -1,7 +1,9 @@
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::db::UserRole;
+use crate::db::{Email, UserId, UserRole};
+#[cfg(feature = "ssr")]
+use crate::error::AppError;
 
 /// Strip internal prefixes from ServerFnError messages for user-friendly display.
 pub fn clean_error(e: &ServerFnError) -> String {
@@ -21,10 +23,9 @@ mod validation;
 pub use validation::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[cfg_attr(feature = "ssr", derive(sqlx::FromRow))]
 pub struct AuthUser {
-    pub id: String,
-    pub email: String,
+    pub id: UserId,
+    pub email: Email,
     pub display_name: String,
     pub role: UserRole,
 }
@@ -48,7 +49,7 @@ pub async fn get_me() -> Result<Option<AuthUser>, ServerFnError> {
         Ok(None) => tracing::info!("get_me: no session found"),
         Err(e) => tracing::warn!("get_me: error: {}", e),
     }
-    result
+    Ok(result?)
 }
 
 #[server]
@@ -57,7 +58,7 @@ pub async fn logout() -> Result<(), ServerFnError> {
     session
         .flush()
         .await
-        .map_err(|e| ServerFnError::new(e.to_string()))?;
+        .map_err(|e| AppError::Internal(e.to_string()))?;
     leptos_axum::redirect("/login");
     Ok(())
 }
