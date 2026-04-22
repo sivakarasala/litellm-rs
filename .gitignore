@@ -1,6 +1,5 @@
 /target
 /pkg
-Cargo.lock
 .env
 *.swp
 *.swo
