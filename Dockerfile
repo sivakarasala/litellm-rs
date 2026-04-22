@@ -5,7 +5,7 @@ RUN rustup target add wasm32-unknown-unknown
 RUN cargo install cargo-leptos
 
 # Install dart-sass
-RUN curl -fsSL https://github.com/nicolo-ribaudo/dart-sass-builds/releases/download/1.71.1/dart-sass-1.71.1-linux-x64.tar.gz \
+RUN curl -fsSL -L https://github.com/sass/dart-sass/releases/download/1.86.3/dart-sass-1.86.3-linux-x64.tar.gz \
     | tar xz -C /usr/local/bin --strip-components=1 dart-sass/sass
 
 WORKDIR /app
