@@ -143,10 +143,8 @@ pub async fn add_provider_key(
     let user = require_admin().await?;
     let pool = crate::db::db().await?;
 
-    let name = name.trim().to_string();
-    if name.is_empty() {
-        return Err(AppError::Validation("Name is required".into()).into());
-    }
+    let name = crate::auth::validate_name(&name)?;
+
     let api_key = api_key.trim().to_string();
     if api_key.is_empty() {
         return Err(AppError::Validation("API key is required".into()).into());

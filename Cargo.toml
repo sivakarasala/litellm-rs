@@ -46,6 +46,7 @@ sha2 = { version = "0.10", optional = true }
 rust_decimal = { version = "1", features = ["serde-str"], optional = true }
 time = { version = "0.3", optional = true }
 js-sys = { version = "0.3", optional = true }
+validator = "0.19"
 
 [features]
 hydrate = [

@@ -173,10 +173,7 @@ pub async fn create_virtual_key(
     let user = require_admin().await?;
     let pool = crate::db::db().await?;
 
-    let name = name.trim().to_string();
-    if name.is_empty() {
-        return Err(AppError::Validation("Name is required".into()).into());
-    }
+    let name = crate::auth::validate_name(&name)?;
 
     let provider_uuid: uuid::Uuid = provider_key_id
         .parse()

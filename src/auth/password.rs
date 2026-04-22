@@ -8,11 +8,14 @@ use leptos::prelude::*;
 pub async fn login_with_password(email: String, password: String) -> Result<(), ServerFnError> {
     use argon2::{Argon2, PasswordHash, PasswordVerifier};
 
+    let email = super::validate_email(&email)?;
+    super::validate_password(&password)?;
+
     let pool = crate::db::db().await?;
 
     let row = sqlx::query!(
         "SELECT id, password_hash FROM users WHERE email = LOWER($1)",
-        email
+        email.as_str()
     )
     .fetch_optional(&pool)
     .await
@@ -27,7 +30,7 @@ pub async fn login_with_password(email: String, password: String) -> Result<(), 
                 "auth.login_failed",
                 Some("user"),
                 None,
-                Some(serde_json::json!({"email": email, "reason": "not_found"})),
+                Some(serde_json::json!({"email": email.as_str(), "reason": "not_found"})),
                 None,
             )
             .await;

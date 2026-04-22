@@ -63,6 +63,17 @@ uuid_newtype!(ApprovedEmailId, "approved email ID");
 pub struct Email(String);
 
 impl Email {
+    /// Parse and validate an email address. Returns error if invalid.
+    pub fn parse(s: String) -> Result<Self, String> {
+        use validator::ValidateEmail;
+        let s = s.trim().to_lowercase();
+        if s.validate_email() {
+            Ok(Self(s))
+        } else {
+            Err(format!("{} is not a valid email address.", s))
+        }
+    }
+
     pub fn as_str(&self) -> &str {
         &self.0
     }
@@ -71,6 +82,12 @@ impl Email {
     #[cfg(feature = "ssr")]
     pub fn from_trusted(email: String) -> Self {
         Self(email)
+    }
+}
+
+impl AsRef<str> for Email {
+    fn as_ref(&self) -> &str {
+        &self.0
     }
 }
 

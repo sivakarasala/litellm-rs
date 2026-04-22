@@ -1,5 +1,6 @@
 use crate::auth::clean_error;
 use crate::auth::password::{LoginWithPassword, RegisterWithPassword};
+use crate::db::Email;
 use leptos::prelude::*;
 
 #[component]
@@ -16,6 +17,71 @@ pub fn LoginPage() -> impl IntoView {
     let register_success = RwSignal::new(false);
 
     let register_form: NodeRef<leptos::html::Form> = NodeRef::new();
+
+    // Client-side validation signals
+    let (login_email, set_login_email) = signal(String::new());
+    let (reg_email, set_reg_email) = signal(String::new());
+    let (reg_name, set_reg_name) = signal(String::new());
+    let (reg_password, set_reg_password) = signal(String::new());
+
+    let login_email_error = Memo::new(move |_| {
+        let e = login_email.get();
+        if e.is_empty() {
+            return None;
+        }
+        Email::parse(e).err()
+    });
+
+    let reg_email_error = Memo::new(move |_| {
+        let e = reg_email.get();
+        if e.is_empty() {
+            return None;
+        }
+        Email::parse(e).err()
+    });
+
+    let reg_name_error = Memo::new(move |_| {
+        let n = reg_name.get();
+        if n.is_empty() {
+            return None;
+        }
+        let trimmed = n.trim();
+        if trimmed.is_empty() {
+            Some("Name is required".to_string())
+        } else if trimmed.len() < 4 {
+            Some("Name must be at least 4 characters".to_string())
+        } else if trimmed.len() > 100 {
+            Some("Name is too long".to_string())
+        } else {
+            None
+        }
+    });
+
+    let reg_password_error = Memo::new(move |_| {
+        let p = reg_password.get();
+        if p.is_empty() {
+            return None;
+        }
+        if p.len() < 8 {
+            Some("Password must be at least 8 characters".to_string())
+        } else if p.len() > 128 {
+            Some("Password is too long".to_string())
+        } else {
+            None
+        }
+    });
+
+    let login_has_errors =
+        Memo::new(move |_| login_email.get().is_empty() || login_email_error.get().is_some());
+
+    let reg_has_errors = Memo::new(move |_| {
+        reg_email.get().is_empty()
+            || reg_name.get().trim().is_empty()
+            || reg_password.get().is_empty()
+            || reg_email_error.get().is_some()
+            || reg_name_error.get().is_some()
+            || reg_password_error.get().is_some()
+    });
 
     // Handle login result
     Effect::new(move |_| match login.value().get() {
@@ -57,13 +123,24 @@ pub fn LoginPage() -> impl IntoView {
                 <Show when=move || !show_register.get()>
                     <div class="auth-form">
                         <ActionForm action=login>
-                            <input type="email" name="email" placeholder="Email" required />
+                            <div class="field-group">
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Email"
+                                    required
+                                    on:input=move |ev| set_login_email.set(event_target_value(&ev))
+                                />
+                                {move || login_email_error.get().map(|e| view! {
+                                    <span class="field-error">{e}</span>
+                                })}
+                            </div>
                             <input type="password" name="password" placeholder="Password" required />
                             <button
                                 type="submit"
                                 class="auth-submit"
                                 class:auth-submit--success=move || login_success.get()
-                                disabled=move || login_pending.get() || login_success.get()
+                                disabled=move || login_pending.get() || login_success.get() || login_has_errors.get()
                             >
                                 {move || if login_success.get() {
                                     "Signed in!"
@@ -87,14 +164,50 @@ pub fn LoginPage() -> impl IntoView {
                 <Show when=move || show_register.get()>
                     <div class="auth-form">
                         <ActionForm action=register node_ref=register_form>
-                            <input type="text" name="name" placeholder="Display name" required maxlength="100" />
-                            <input type="email" name="email" placeholder="Email" required />
-                            <input type="password" name="password" placeholder="Password (min 8 chars)" required minlength="8" />
+                            <div class="field-group">
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Display name"
+                                    required
+                                    minlength="4"
+                                    maxlength="100"
+                                    on:input=move |ev| set_reg_name.set(event_target_value(&ev))
+                                />
+                                {move || reg_name_error.get().map(|e| view! {
+                                    <span class="field-error">{e}</span>
+                                })}
+                            </div>
+                            <div class="field-group">
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Email"
+                                    required
+                                    on:input=move |ev| set_reg_email.set(event_target_value(&ev))
+                                />
+                                {move || reg_email_error.get().map(|e| view! {
+                                    <span class="field-error">{e}</span>
+                                })}
+                            </div>
+                            <div class="field-group">
+                                <input
+                                    type="password"
+                                    name="password"
+                                    placeholder="Password (min 8 chars)"
+                                    required
+                                    minlength="8"
+                                    on:input=move |ev| set_reg_password.set(event_target_value(&ev))
+                                />
+                                {move || reg_password_error.get().map(|e| view! {
+                                    <span class="field-error">{e}</span>
+                                })}
+                            </div>
                             <button
                                 type="submit"
                                 class="auth-submit"
                                 class:auth-submit--success=move || register_success.get()
-                                disabled=move || register_pending.get() || register_success.get()
+                                disabled=move || register_pending.get() || register_success.get() || reg_has_errors.get()
                             >
                                 {move || if register_success.get() {
                                     "Account created!"

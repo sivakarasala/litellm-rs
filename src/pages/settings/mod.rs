@@ -1,4 +1,5 @@
 use crate::auth::clean_error;
+use crate::components::DeleteModal;
 use crate::keys::approved_emails::{
     list_approved_emails, AddApprovedEmail, ApprovedEmailInfo, DeleteApprovedEmail,
     ToggleApprovedEmail,
@@ -73,7 +74,7 @@ fn ProviderKeysSection() -> impl IntoView {
                         <div class="form-grid">
                             <div class="form-field">
                                 <label>"Name"</label>
-                                <input type="text" name="name" placeholder="e.g. Production OpenAI" required />
+                                <input type="text" name="name" placeholder="e.g. Production OpenAI" required minlength="4" maxlength="100" />
                             </div>
                             <div class="form-field">
                                 <label>"Provider"</label>
@@ -168,6 +169,7 @@ fn ProviderKeyRow(
     delete_action: ServerAction<DeleteProviderKey>,
 ) -> impl IntoView {
     let key_id = key.id.to_string();
+    let show_delete = RwSignal::new(false);
     let status_class = if key.is_active {
         "badge badge--active"
     } else {
@@ -183,14 +185,20 @@ fn ProviderKeyRow(
             <td class="cell--url">{key.base_url}</td>
             <td><span class=status_class>{status_text}</span></td>
             <td>
-                <ActionForm action=delete_action>
-                    <input type="hidden" name="key_id" value=key_id/>
-                    <button type="submit" class="btn btn--danger btn--sm"
-                        disabled=move || delete_action.pending().get()
-                    >"Delete"</button>
-                </ActionForm>
+                <button class="btn btn--danger btn--sm"
+                    on:click=move |_| show_delete.set(true)
+                >"Delete"</button>
             </td>
         </tr>
+        <DeleteModal
+            show=show_delete
+            title="Delete this provider key?"
+            subtitle="Virtual keys using this provider will stop working."
+            on_confirm=move || {
+                let id = key_id.clone();
+                delete_action.dispatch(DeleteProviderKey { key_id: id });
+            }
+        />
     }
 }
 
@@ -368,6 +376,7 @@ fn ApprovedEmailRow(
     let toggle_id = email_id.clone();
     let delete_id = email_id;
     let is_active = email.is_active;
+    let show_delete = RwSignal::new(false);
 
     let status_class = if email.is_active {
         "badge badge--active"
@@ -409,13 +418,19 @@ fn ApprovedEmailRow(
                         {if is_active { "Disable" } else { "Enable" }}
                     </button>
                 </ActionForm>
-                <ActionForm action=delete_action>
-                    <input type="hidden" name="email_id" value=delete_id/>
-                    <button type="submit" class="btn btn--danger btn--sm"
-                        disabled=move || delete_action.pending().get()
-                    >"Delete"</button>
-                </ActionForm>
+                <button class="btn btn--danger btn--sm"
+                    on:click=move |_| show_delete.set(true)
+                >"Delete"</button>
             </td>
         </tr>
+        <DeleteModal
+            show=show_delete
+            title="Delete this approved email?"
+            subtitle="This email will no longer be able to request self-service tokens."
+            on_confirm=move || {
+                let id = delete_id.clone();
+                delete_action.dispatch(DeleteApprovedEmail { email_id: id });
+            }
+        />
     }
 }

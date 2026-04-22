@@ -1,11 +1,16 @@
 use crate::db::{Email, UserRole};
 use crate::error::AppError;
 
-/// Validate a display name: trimmed, non-empty, max 100 chars.
+/// Validate a display name: trimmed, 4-100 chars.
 pub fn validate_name(name: &str) -> Result<String, AppError> {
     let name = name.trim().to_string();
     if name.is_empty() {
         return Err(AppError::Validation("Name is required".into()));
+    }
+    if name.len() < 4 {
+        return Err(AppError::Validation(
+            "Name must be at least 4 characters".into(),
+        ));
     }
     if name.len() > 100 {
         return Err(AppError::Validation("Name is too long".into()));
@@ -13,16 +18,9 @@ pub fn validate_name(name: &str) -> Result<String, AppError> {
     Ok(name)
 }
 
-/// Validate an email address: trimmed, lowercased, must contain @ and dot.
+/// Validate an email address using the `validator` crate (RFC 5322).
 pub fn validate_email(email: &str) -> Result<Email, AppError> {
-    let email = email.trim().to_lowercase();
-    if email.is_empty() {
-        return Err(AppError::Validation("Email is required".into()));
-    }
-    if !email.contains('@') || !email.contains('.') {
-        return Err(AppError::Validation("Invalid email address".into()));
-    }
-    Ok(Email::from_trusted(email))
+    Email::parse(email.to_string()).map_err(AppError::Validation)
 }
 
 /// Validate password length: 8-128 characters.

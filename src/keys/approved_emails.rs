@@ -78,10 +78,9 @@ pub async fn add_approved_email(
     let user = require_admin().await?;
     let pool = crate::db::db().await?;
 
-    let email = email.trim().to_lowercase();
-    if email.is_empty() {
-        return Err(AppError::Validation("Email is required".into()).into());
-    }
+    let email =
+        crate::auth::validate_email(&email).map_err(|e| ServerFnError::new(e.to_string()))?;
+    let email = email.as_str().to_string();
 
     let provider_uuid: Option<uuid::Uuid> = provider_key_id
         .as_deref()
@@ -223,15 +222,11 @@ pub async fn request_token(
 
     let pool = crate::db::db().await?;
 
-    let name = name.trim().to_string();
-    if name.is_empty() {
-        return Err(AppError::Validation("Name is required".into()).into());
-    }
+    let name = crate::auth::validate_name(&name).map_err(|e| ServerFnError::new(e.to_string()))?;
 
-    let email = email.trim().to_lowercase();
-    if email.is_empty() {
-        return Err(AppError::Validation("Email is required".into()).into());
-    }
+    let email =
+        crate::auth::validate_email(&email).map_err(|e| ServerFnError::new(e.to_string()))?;
+    let email = email.as_str().to_string();
 
     // Look up approved email (case-insensitive)
     let approved = sqlx::query!(

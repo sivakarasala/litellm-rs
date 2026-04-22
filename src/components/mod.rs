@@ -1,1 +1,3 @@
-// Components will be added in later phases
+mod delete_modal;
+
+pub use delete_modal::DeleteModal;

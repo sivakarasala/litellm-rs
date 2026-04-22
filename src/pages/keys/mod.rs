@@ -1,4 +1,5 @@
 use crate::auth::clean_error;
+use crate::components::DeleteModal;
 use crate::keys::provider_keys::{list_provider_keys, ProviderKeyInfo};
 use crate::keys::virtual_keys::{
     list_virtual_keys, CreateVirtualKey, DeleteVirtualKey, ToggleVirtualKey, VirtualKeyCreated,
@@ -174,7 +175,7 @@ fn CreateKeyForm(
                 <div class="form-grid">
                     <div class="form-field">
                         <label>"Key Name"</label>
-                        <input type="text" name="name" placeholder="e.g. Frontend App" required />
+                        <input type="text" name="name" placeholder="e.g. Frontend App" required minlength="4" maxlength="100" />
                     </div>
                     <div class="form-field">
                         <label>"Provider Key"</label>
@@ -266,6 +267,7 @@ fn VirtualKeyRow(
     let toggle_id = key_id.clone();
     let delete_id = key_id;
     let is_active = key.is_active;
+    let show_delete = RwSignal::new(false);
 
     let status_class = if key.is_active {
         "badge badge--active"
@@ -306,13 +308,19 @@ fn VirtualKeyRow(
                         {if is_active { "Disable" } else { "Enable" }}
                     </button>
                 </ActionForm>
-                <ActionForm action=delete_action>
-                    <input type="hidden" name="key_id" value=delete_id/>
-                    <button type="submit" class="btn btn--danger btn--sm"
-                        disabled=move || delete_action.pending().get()
-                    >"Delete"</button>
-                </ActionForm>
+                <button class="btn btn--danger btn--sm"
+                    on:click=move |_| show_delete.set(true)
+                >"Delete"</button>
             </td>
         </tr>
+        <DeleteModal
+            show=show_delete
+            title="Delete this virtual key?"
+            subtitle="This will permanently remove the key. Any clients using it will lose access."
+            on_confirm=move || {
+                let id = delete_id.clone();
+                delete_action.dispatch(DeleteVirtualKey { key_id: id });
+            }
+        />
     }
 }

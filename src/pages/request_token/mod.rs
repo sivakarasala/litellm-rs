@@ -40,7 +40,7 @@ pub fn RequestTokenPage() -> impl IntoView {
                         <div class="request-token-form">
                             <div class="form-field form-field--full">
                                 <label>"Your Name"</label>
-                                <input type="text" name="name" placeholder="Jane Doe" required />
+                                <input type="text" name="name" placeholder="Jane Doe" required minlength="4" maxlength="100" />
                             </div>
                             <div class="form-field form-field--full">
                                 <label>"Email Address"</label>
