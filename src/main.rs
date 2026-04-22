@@ -62,7 +62,20 @@ async fn main() {
 
     let api_routes = Router::new().route("/health_check", get(health_check));
 
+    // Proxy routes (OpenAI-compatible)
+    let proxy_routes = Router::new()
+        .route(
+            "/chat/completions",
+            axum::routing::post(litellm_rs::proxy::chat_completions::chat_completions),
+        )
+        .route(
+            "/embeddings",
+            axum::routing::post(litellm_rs::proxy::embeddings::embeddings),
+        )
+        .route("/models", get(litellm_rs::proxy::models::list_models));
+
     let app = Router::new()
+        .nest("/v1", proxy_routes)
         .nest("/api/v1", api_routes)
         .merge(SwaggerUi::new("/api/swagger-ui").url("/api/openapi.json", ApiDoc::openapi()))
         .leptos_routes_with_context(

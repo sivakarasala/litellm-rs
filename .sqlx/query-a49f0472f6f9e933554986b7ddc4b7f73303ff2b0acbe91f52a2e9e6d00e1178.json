@@ -1,0 +1,74 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT vk.id, vk.key_hash, vk.provider_key_id, vk.is_active,\n                  vk.expires_at, vk.allowed_models,\n                  pk.api_key_encrypted, pk.api_key_nonce, pk.base_url, pk.is_active as provider_active\n           FROM virtual_keys vk\n           JOIN provider_keys pk ON vk.provider_key_id = pk.id\n           WHERE vk.is_active = true",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "key_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "provider_key_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "is_active",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "expires_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "allowed_models",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 6,
+        "name": "api_key_encrypted",
+        "type_info": "Bytea"
+      },
+      {
+        "ordinal": 7,
+        "name": "api_key_nonce",
+        "type_info": "Bytea"
+      },
+      {
+        "ordinal": 8,
+        "name": "base_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "provider_active",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "a49f0472f6f9e933554986b7ddc4b7f73303ff2b0acbe91f52a2e9e6d00e1178"
+}

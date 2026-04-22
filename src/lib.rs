@@ -12,6 +12,8 @@ pub mod error;
 pub mod keys;
 pub mod pages;
 #[cfg(feature = "ssr")]
+pub mod proxy;
+#[cfg(feature = "ssr")]
 pub mod routes;
 #[cfg(feature = "ssr")]
 pub mod telemetry;
