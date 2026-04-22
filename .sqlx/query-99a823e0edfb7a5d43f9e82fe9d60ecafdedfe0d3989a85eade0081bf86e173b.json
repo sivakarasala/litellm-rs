@@ -1,0 +1,30 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO virtual_keys\n           (key_hash, key_prefix, name, provider_key_id, max_budget_usd,\n            rpm_limit, tpm_limit, expires_at, created_by)\n           VALUES ($1, $2, $3, $4, $5, $6, $7, $8::timestamptz, $9)\n           RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Uuid",
+        "Numeric",
+        "Int4",
+        "Int4",
+        "Timestamptz",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "99a823e0edfb7a5d43f9e82fe9d60ecafdedfe0d3989a85eade0081bf86e173b"
+}

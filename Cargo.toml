@@ -16,7 +16,7 @@ leptos_axum = { version = "0.8", optional = true }
 leptos_meta = { version = "0.8" }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
 wasm-bindgen = { version = "0.2.106", optional = true }
-sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "migrate", "uuid", "chrono", "tls-rustls"], optional = true }
+sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "migrate", "uuid", "chrono", "tls-rustls", "rust_decimal"], optional = true }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 config = { version = "0.15", default-features = false, features = ["yaml"], optional = true }
@@ -43,6 +43,7 @@ rand = { version = "0.8", optional = true }
 tokio-stream = { version = "0.1", optional = true }
 futures = { version = "0.3", optional = true }
 sha2 = { version = "0.10", optional = true }
+rust_decimal = { version = "1", features = ["serde-str"], optional = true }
 js-sys = { version = "0.3", optional = true }
 
 [features]
@@ -81,6 +82,7 @@ ssr = [
     "dep:tokio-stream",
     "dep:futures",
     "dep:sha2",
+    "dep:rust_decimal",
     "leptos/ssr",
     "leptos_meta/ssr",
     "leptos_router/ssr",
@@ -91,6 +93,8 @@ reqwest = "0.12"
 tokio = { version = "1", features = ["rt", "macros"] }
 sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "migrate"] }
 uuid = { version = "1", features = ["v4"] }
+hex = "0.4"
+chrono = "0.4"
 
 [profile.wasm-release]
 inherits = "release"

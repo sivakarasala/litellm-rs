@@ -56,6 +56,7 @@ macro_rules! uuid_newtype {
 
 uuid_newtype!(UserId, "user ID");
 uuid_newtype!(ProviderKeyId, "provider key ID");
+uuid_newtype!(VirtualKeyId, "virtual key ID");
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Email(String);
