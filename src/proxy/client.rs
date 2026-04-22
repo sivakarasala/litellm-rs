@@ -1,6 +1,7 @@
 use axum::http::StatusCode;
 use reqwest::Client;
 use std::sync::OnceLock;
+use time::OffsetDateTime;
 
 use crate::error::AppError;
 
@@ -118,8 +119,7 @@ pub async fn resolve_key(bearer_token: &str) -> Result<ResolvedKey, AppError> {
         if keygen::verify_key(bearer_token, &key.key_hash)? {
             // Check expiry
             if let Some(expires_at) = key.expires_at {
-                let now_str = chrono::Utc::now().to_rfc3339();
-                if expires_at.to_string() < now_str {
+                if expires_at < OffsetDateTime::now_utc() {
                     return Err(AppError::Validation("API key has expired".into()));
                 }
             }
