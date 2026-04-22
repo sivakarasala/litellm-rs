@@ -140,6 +140,9 @@ fn ProviderKeyTable(
     keys: Vec<ProviderKeyInfo>,
     delete_action: ServerAction<DeleteProviderKey>,
 ) -> impl IntoView {
+    let show_delete = RwSignal::new(false);
+    let pending_delete_id: RwSignal<Option<String>> = RwSignal::new(None);
+
     view! {
         <div class="data-table-wrap">
             <table class="data-table">
@@ -155,21 +158,32 @@ fn ProviderKeyTable(
                 </thead>
                 <tbody>
                     {keys.into_iter().map(|key| {
-                        view! { <ProviderKeyRow key=key delete_action=delete_action/> }
+                        let id = key.id.to_string();
+                        view! { <ProviderKeyRow key=key
+                            on_delete=move || {
+                                pending_delete_id.set(Some(id.clone()));
+                                show_delete.set(true);
+                            }
+                        /> }
                     }).collect_view()}
                 </tbody>
             </table>
         </div>
+        <DeleteModal
+            show=show_delete
+            title="Delete this provider key?"
+            subtitle="Virtual keys using this provider will stop working."
+            on_confirm=move || {
+                if let Some(id) = pending_delete_id.get() {
+                    delete_action.dispatch(DeleteProviderKey { key_id: id });
+                }
+            }
+        />
     }
 }
 
 #[component]
-fn ProviderKeyRow(
-    key: ProviderKeyInfo,
-    delete_action: ServerAction<DeleteProviderKey>,
-) -> impl IntoView {
-    let key_id = key.id.to_string();
-    let show_delete = RwSignal::new(false);
+fn ProviderKeyRow(key: ProviderKeyInfo, #[prop(into)] on_delete: Callback<()>) -> impl IntoView {
     let status_class = if key.is_active {
         "badge badge--active"
     } else {
@@ -186,19 +200,10 @@ fn ProviderKeyRow(
             <td><span class=status_class>{status_text}</span></td>
             <td>
                 <button class="btn btn--danger btn--sm"
-                    on:click=move |_| show_delete.set(true)
+                    on:click=move |_| on_delete.run(())
                 >"Delete"</button>
             </td>
         </tr>
-        <DeleteModal
-            show=show_delete
-            title="Delete this provider key?"
-            subtitle="Virtual keys using this provider will stop working."
-            on_confirm=move || {
-                let id = key_id.clone();
-                delete_action.dispatch(DeleteProviderKey { key_id: id });
-            }
-        />
     }
 }
 
@@ -343,6 +348,9 @@ fn ApprovedEmailTable(
     toggle_action: ServerAction<ToggleApprovedEmail>,
     delete_action: ServerAction<DeleteApprovedEmail>,
 ) -> impl IntoView {
+    let show_delete = RwSignal::new(false);
+    let pending_delete_id: RwSignal<Option<String>> = RwSignal::new(None);
+
     view! {
         <div class="data-table-wrap">
             <table class="data-table">
@@ -358,11 +366,27 @@ fn ApprovedEmailTable(
                 </thead>
                 <tbody>
                     {emails.into_iter().map(|email| {
-                        view! { <ApprovedEmailRow email=email toggle_action=toggle_action delete_action=delete_action/> }
+                        let id = email.id.to_string();
+                        view! { <ApprovedEmailRow email=email toggle_action=toggle_action
+                            on_delete=move || {
+                                pending_delete_id.set(Some(id.clone()));
+                                show_delete.set(true);
+                            }
+                        /> }
                     }).collect_view()}
                 </tbody>
             </table>
         </div>
+        <DeleteModal
+            show=show_delete
+            title="Delete this approved email?"
+            subtitle="This email will no longer be able to request self-service tokens."
+            on_confirm=move || {
+                if let Some(id) = pending_delete_id.get() {
+                    delete_action.dispatch(DeleteApprovedEmail { email_id: id });
+                }
+            }
+        />
     }
 }
 
@@ -370,13 +394,10 @@ fn ApprovedEmailTable(
 fn ApprovedEmailRow(
     email: ApprovedEmailInfo,
     toggle_action: ServerAction<ToggleApprovedEmail>,
-    delete_action: ServerAction<DeleteApprovedEmail>,
+    #[prop(into)] on_delete: Callback<()>,
 ) -> impl IntoView {
-    let email_id = email.id.to_string();
-    let toggle_id = email_id.clone();
-    let delete_id = email_id;
+    let toggle_id = email.id.to_string();
     let is_active = email.is_active;
-    let show_delete = RwSignal::new(false);
 
     let status_class = if email.is_active {
         "badge badge--active"
@@ -419,18 +440,9 @@ fn ApprovedEmailRow(
                     </button>
                 </ActionForm>
                 <button class="btn btn--danger btn--sm"
-                    on:click=move |_| show_delete.set(true)
+                    on:click=move |_| on_delete.run(())
                 >"Delete"</button>
             </td>
         </tr>
-        <DeleteModal
-            show=show_delete
-            title="Delete this approved email?"
-            subtitle="This email will no longer be able to request self-service tokens."
-            on_confirm=move || {
-                let id = delete_id.clone();
-                delete_action.dispatch(DeleteApprovedEmail { email_id: id });
-            }
-        />
     }
 }

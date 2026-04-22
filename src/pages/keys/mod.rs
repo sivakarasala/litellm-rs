@@ -233,6 +233,9 @@ fn VirtualKeyTable(
     toggle_action: ServerAction<ToggleVirtualKey>,
     delete_action: ServerAction<DeleteVirtualKey>,
 ) -> impl IntoView {
+    let show_delete = RwSignal::new(false);
+    let pending_delete_id: RwSignal<Option<String>> = RwSignal::new(None);
+
     view! {
         <div class="data-table-wrap">
             <table class="data-table">
@@ -249,11 +252,27 @@ fn VirtualKeyTable(
                 </thead>
                 <tbody>
                     {keys.into_iter().map(|key| {
-                        view! { <VirtualKeyRow key=key toggle_action=toggle_action delete_action=delete_action/> }
+                        let id = key.id.to_string();
+                        view! { <VirtualKeyRow key=key toggle_action=toggle_action
+                            on_delete=move || {
+                                pending_delete_id.set(Some(id.clone()));
+                                show_delete.set(true);
+                            }
+                        /> }
                     }).collect_view()}
                 </tbody>
             </table>
         </div>
+        <DeleteModal
+            show=show_delete
+            title="Delete this virtual key?"
+            subtitle="This will permanently remove the key. Any clients using it will lose access."
+            on_confirm=move || {
+                if let Some(id) = pending_delete_id.get() {
+                    delete_action.dispatch(DeleteVirtualKey { key_id: id });
+                }
+            }
+        />
     }
 }
 
@@ -261,13 +280,10 @@ fn VirtualKeyTable(
 fn VirtualKeyRow(
     key: VirtualKeyInfo,
     toggle_action: ServerAction<ToggleVirtualKey>,
-    delete_action: ServerAction<DeleteVirtualKey>,
+    #[prop(into)] on_delete: Callback<()>,
 ) -> impl IntoView {
-    let key_id = key.id.to_string();
-    let toggle_id = key_id.clone();
-    let delete_id = key_id;
+    let toggle_id = key.id.to_string();
     let is_active = key.is_active;
-    let show_delete = RwSignal::new(false);
 
     let status_class = if key.is_active {
         "badge badge--active"
@@ -309,18 +325,9 @@ fn VirtualKeyRow(
                     </button>
                 </ActionForm>
                 <button class="btn btn--danger btn--sm"
-                    on:click=move |_| show_delete.set(true)
+                    on:click=move |_| on_delete.run(())
                 >"Delete"</button>
             </td>
         </tr>
-        <DeleteModal
-            show=show_delete
-            title="Delete this virtual key?"
-            subtitle="This will permanently remove the key. Any clients using it will lose access."
-            on_confirm=move || {
-                let id = delete_id.clone();
-                delete_action.dispatch(DeleteVirtualKey { key_id: id });
-            }
-        />
     }
 }
