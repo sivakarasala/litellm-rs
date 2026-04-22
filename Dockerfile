@@ -4,9 +4,9 @@ FROM rustlang/rust:nightly-bookworm AS builder
 RUN rustup target add wasm32-unknown-unknown
 RUN cargo install cargo-leptos
 
-# Install dart-sass
+# Install dart-sass (extract full directory, then symlink)
 RUN curl -fsSL -L https://github.com/sass/dart-sass/releases/download/1.86.3/dart-sass-1.86.3-linux-x64.tar.gz \
-    | tar xz -C /usr/local/bin --strip-components=1 dart-sass/sass
+    | tar xz -C /usr/local && ln -s /usr/local/dart-sass/sass /usr/local/bin/sass
 
 WORKDIR /app
 
