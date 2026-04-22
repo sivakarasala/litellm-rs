@@ -1,5 +1,5 @@
 use crate::auth::{get_me, AuthUser, Logout};
-use crate::pages::{DashboardPage, LoginPage};
+use crate::pages::{DashboardPage, LoginPage, SettingsPage};
 use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
 use leptos_router::{
@@ -56,6 +56,7 @@ pub fn App() -> impl IntoView {
                             <div class=move || if is_authed { "main-content" } else { "main-content--full" }>
                                 <Routes fallback=|| "Page not found.".into_view()>
                                     <Route path=StaticSegment("login") view=LoginPage/>
+                                    <Route path=StaticSegment("settings") view=SettingsPage/>
                                     <Route path=StaticSegment("") view=move || {
                                         if is_authed { view! { <DashboardPage/> }.into_any() }
                                         else { view! { <LoginPage/> }.into_any() }

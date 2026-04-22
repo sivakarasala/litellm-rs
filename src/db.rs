@@ -21,33 +21,41 @@ pub async fn db() -> Result<sqlx::PgPool, AppError> {
 
 // ---- Newtypes ----
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct UserId(String);
+/// Generate a UUID-backed newtype with Display, SSR-only from_uuid/as_uuid.
+macro_rules! uuid_newtype {
+    ($name:ident, $label:literal) => {
+        #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+        pub struct $name(String);
 
-impl UserId {
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
+        impl $name {
+            pub fn as_str(&self) -> &str {
+                &self.0
+            }
+        }
+
+        #[cfg(feature = "ssr")]
+        impl $name {
+            pub fn from_uuid(id: uuid::Uuid) -> Self {
+                Self(id.to_string())
+            }
+
+            pub fn as_uuid(&self) -> Result<uuid::Uuid, AppError> {
+                self.0
+                    .parse()
+                    .map_err(|_| AppError::Internal(format!("Invalid {} format", $label)))
+            }
+        }
+
+        impl fmt::Display for $name {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                self.0.fmt(f)
+            }
+        }
+    };
 }
 
-#[cfg(feature = "ssr")]
-impl UserId {
-    pub fn from_uuid(id: uuid::Uuid) -> Self {
-        Self(id.to_string())
-    }
-
-    pub fn as_uuid(&self) -> Result<uuid::Uuid, AppError> {
-        self.0
-            .parse()
-            .map_err(|_| AppError::Internal("Invalid user ID format".into()))
-    }
-}
-
-impl fmt::Display for UserId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(f)
-    }
-}
+uuid_newtype!(UserId, "user ID");
+uuid_newtype!(ProviderKeyId, "provider key ID");
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Email(String);

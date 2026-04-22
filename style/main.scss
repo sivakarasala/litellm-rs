@@ -326,3 +326,286 @@ a {
         color: $text-secondary;
     }
 }
+
+// ─── Page Layout ───
+
+.page-header {
+    margin-bottom: 1.5rem;
+
+    h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.section-header {
+    h2 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+}
+
+.section-desc {
+    font-size: 0.875rem;
+    color: $text-secondary;
+}
+
+// ─── Cards ───
+
+.card {
+    background: $bg;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    padding: 1.25rem;
+
+    &--form {
+        margin-bottom: 0.5rem;
+    }
+}
+
+// ─── Buttons ───
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: $font-sans;
+    border-radius: $radius-sm;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    &--primary {
+        background: $accent;
+        color: white;
+        border-color: $accent;
+
+        &:hover:not(:disabled) {
+            background: $accent-hover;
+        }
+    }
+
+    &--secondary {
+        background: $bg;
+        color: $text-secondary;
+        border-color: $border;
+
+        &:hover:not(:disabled) {
+            background: $surface;
+            color: $text-primary;
+        }
+    }
+
+    &--danger {
+        background: $bg;
+        color: $danger;
+        border-color: $border;
+
+        &:hover:not(:disabled) {
+            background: $danger-bg;
+            border-color: $danger;
+        }
+    }
+
+    &--sm {
+        padding: 0.25rem 0.625rem;
+        font-size: 0.8125rem;
+    }
+}
+
+// ─── Forms ───
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    &--full {
+        grid-column: 1 / -1;
+    }
+
+    label {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: $text-secondary;
+    }
+
+    input, select {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid $border;
+        border-radius: $radius-sm;
+        font-size: 0.875rem;
+        font-family: $font-sans;
+        color: $text-primary;
+        background: $bg;
+        outline: none;
+        transition: border-color 0.15s;
+
+        &:focus {
+            border-color: $accent;
+            box-shadow: 0 0 0 3px rgba($accent, 0.1);
+        }
+    }
+
+    select {
+        cursor: pointer;
+    }
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+// ─── Data Table ───
+
+.data-table-wrap {
+    background: $bg;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+
+    th {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        font-size: 0.8125rem;
+        color: $text-secondary;
+        background: $surface;
+        border-bottom: 1px solid $border;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid $border-light;
+        color: $text-primary;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover {
+        background: $surface-alt;
+    }
+}
+
+.cell--name {
+    font-weight: 500;
+}
+
+.cell--url {
+    font-size: 0.8125rem;
+    color: $text-secondary;
+}
+
+.cell--date {
+    font-size: 0.8125rem;
+    color: $text-muted;
+    white-space: nowrap;
+}
+
+.key-preview {
+    font-family: $font-mono;
+    font-size: 0.8125rem;
+    background: $surface;
+    padding: 0.125rem 0.375rem;
+    border-radius: $radius-sm;
+    color: $text-secondary;
+}
+
+// ─── Badges ───
+
+.badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+
+    &--active {
+        background: $success-bg;
+        color: $success;
+    }
+
+    &--inactive {
+        background: $surface-alt;
+        color: $text-muted;
+    }
+
+    &--expired {
+        background: $warning-bg;
+        color: $warning;
+    }
+}
+
+// ─── Alerts ───
+
+.alert {
+    padding: 0.625rem 0.875rem;
+    border-radius: $radius-sm;
+    font-size: 0.8125rem;
+
+    &--error {
+        background: $danger-bg;
+        color: $danger;
+    }
+
+    &--success {
+        background: $success-bg;
+        color: $success;
+    }
+}
+
+// ─── Empty State ───
+
+.empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: $text-secondary;
+    font-size: 0.875rem;
+
+    &__hint {
+        margin-top: 0.25rem;
+        font-size: 0.8125rem;
+        color: $text-muted;
+    }
+}
+
+// ─── Skeleton ───
+
+.skeleton-table {
+    padding: 2rem;
+    text-align: center;
+    color: $text-muted;
+    font-size: 0.875rem;
+}
