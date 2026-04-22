@@ -7,6 +7,19 @@ use super::types::{EmbeddingRequest, EmbeddingResponse, OpenAIError};
 use super::usage::{record_usage, UsageRecord};
 
 /// POST /v1/embeddings — embeddings proxy.
+#[utoipa::path(
+    post,
+    path = "/v1/embeddings",
+    tag = "proxy",
+    request_body = EmbeddingRequest,
+    responses(
+        (status = 200, description = "Embedding response", body = EmbeddingResponse),
+        (status = 401, description = "Invalid or missing API key", body = OpenAIError),
+        (status = 402, description = "Budget exceeded", body = OpenAIError),
+        (status = 429, description = "Rate limit exceeded", body = OpenAIError),
+    ),
+    security(("bearer_token" = []))
+)]
 pub async fn embeddings(
     headers: HeaderMap,
     Json(body): Json<EmbeddingRequest>,

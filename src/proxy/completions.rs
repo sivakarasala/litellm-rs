@@ -7,6 +7,19 @@ use super::types::{CompletionRequest, OpenAIError};
 use super::usage::{record_usage, UsageRecord};
 
 /// POST /v1/completions — legacy completions proxy (non-streaming only).
+#[utoipa::path(
+    post,
+    path = "/v1/completions",
+    tag = "proxy",
+    request_body = CompletionRequest,
+    responses(
+        (status = 200, description = "Completion response"),
+        (status = 401, description = "Invalid or missing API key", body = OpenAIError),
+        (status = 402, description = "Budget exceeded", body = OpenAIError),
+        (status = 429, description = "Rate limit exceeded", body = OpenAIError),
+    ),
+    security(("bearer_token" = []))
+)]
 pub async fn completions(
     headers: HeaderMap,
     Json(body): Json<CompletionRequest>,

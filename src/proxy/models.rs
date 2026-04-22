@@ -5,6 +5,16 @@ use super::client::{build_upstream_headers, extract_bearer_token, http_client, r
 use super::types::{ModelsResponse, OpenAIError};
 
 /// GET /v1/models — list available models from upstream.
+#[utoipa::path(
+    get,
+    path = "/v1/models",
+    tag = "proxy",
+    responses(
+        (status = 200, description = "List of available models", body = ModelsResponse),
+        (status = 401, description = "Invalid or missing API key", body = OpenAIError),
+    ),
+    security(("bearer_token" = []))
+)]
 pub async fn list_models(
     headers: HeaderMap,
 ) -> Result<Json<ModelsResponse>, (StatusCode, Json<OpenAIError>)> {

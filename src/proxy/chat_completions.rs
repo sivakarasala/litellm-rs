@@ -11,6 +11,19 @@ use super::types::{ChatCompletionRequest, ChatCompletionResponse, OpenAIError, U
 use super::usage::{record_usage, UsageRecord};
 
 /// POST /v1/chat/completions — streaming + non-streaming proxy.
+#[utoipa::path(
+    post,
+    path = "/v1/chat/completions",
+    tag = "proxy",
+    request_body = ChatCompletionRequest,
+    responses(
+        (status = 200, description = "Completion response", body = ChatCompletionResponse),
+        (status = 401, description = "Invalid or missing API key", body = OpenAIError),
+        (status = 402, description = "Budget exceeded", body = OpenAIError),
+        (status = 429, description = "Rate limit exceeded", body = OpenAIError),
+    ),
+    security(("bearer_token" = []))
+)]
 pub async fn chat_completions(
     headers: HeaderMap,
     Json(body): Json<ChatCompletionRequest>,

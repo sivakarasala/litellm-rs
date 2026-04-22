@@ -1,8 +1,12 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+#[cfg(feature = "ssr")]
+use utoipa::ToSchema;
+
 // ─── Chat Completions ───
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChatCompletionRequest {
     pub model: String,
@@ -13,19 +17,23 @@ pub struct ChatCompletionRequest {
     pub stream_options: Option<Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<f64>,
+    #[cfg_attr(feature = "ssr", schema(ignore))]
     #[serde(flatten)]
     pub extra: Value,
 }
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChatMessage {
     pub role: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<Value>,
+    #[cfg_attr(feature = "ssr", schema(ignore))]
     #[serde(flatten)]
     pub extra: Value,
 }
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChatCompletionResponse {
     pub id: String,
@@ -35,41 +43,49 @@ pub struct ChatCompletionResponse {
     pub choices: Vec<ChatChoice>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub usage: Option<Usage>,
+    #[cfg_attr(feature = "ssr", schema(ignore))]
     #[serde(flatten)]
     pub extra: Value,
 }
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChatChoice {
     pub index: u32,
     pub message: ChatMessage,
     pub finish_reason: Option<String>,
+    #[cfg_attr(feature = "ssr", schema(ignore))]
     #[serde(flatten)]
     pub extra: Value,
 }
 
 // ─── Completions (Legacy) ───
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CompletionRequest {
     pub model: String,
     pub prompt: Value,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stream: Option<bool>,
+    #[cfg_attr(feature = "ssr", schema(ignore))]
     #[serde(flatten)]
     pub extra: Value,
 }
 
 // ─── Embeddings ───
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EmbeddingRequest {
     pub model: String,
     pub input: Value,
+    #[cfg_attr(feature = "ssr", schema(ignore))]
     #[serde(flatten)]
     pub extra: Value,
 }
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EmbeddingResponse {
     pub object: String,
@@ -77,10 +93,12 @@ pub struct EmbeddingResponse {
     pub model: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub usage: Option<Usage>,
+    #[cfg_attr(feature = "ssr", schema(ignore))]
     #[serde(flatten)]
     pub extra: Value,
 }
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EmbeddingData {
     pub object: String,
@@ -90,6 +108,7 @@ pub struct EmbeddingData {
 
 // ─── Models ───
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelsResponse {
     pub object: String,
@@ -98,20 +117,24 @@ pub struct ModelsResponse {
 
 // ─── Shared ───
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Usage {
     pub prompt_tokens: u32,
     pub completion_tokens: Option<u32>,
     pub total_tokens: u32,
+    #[cfg_attr(feature = "ssr", schema(ignore))]
     #[serde(flatten)]
     pub extra: Value,
 }
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OpenAIError {
     pub error: OpenAIErrorDetail,
 }
 
+#[cfg_attr(feature = "ssr", derive(ToSchema))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OpenAIErrorDetail {
     pub message: String,
