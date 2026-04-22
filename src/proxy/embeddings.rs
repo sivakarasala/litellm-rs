@@ -34,6 +34,28 @@ pub async fn embeddings(
         }
     }
 
+    // Check rate limits
+    if let Some(rpm_limit) = resolved.rpm_limit {
+        if let Err(msg) =
+            super::rate_limit::rate_limiter().check_rpm(resolved.virtual_key_id, rpm_limit)
+        {
+            return Err((
+                StatusCode::TOO_MANY_REQUESTS,
+                Json(OpenAIError::new(msg, "rate_limit_error")),
+            ));
+        }
+    }
+
+    // Check budget
+    if let Some(max_budget) = resolved.max_budget_usd {
+        if let Err(e) = super::budget::check_budget(resolved.virtual_key_id, max_budget).await {
+            return Err((
+                StatusCode::PAYMENT_REQUIRED,
+                Json(OpenAIError::new(e.to_string(), "budget_exceeded")),
+            ));
+        }
+    }
+
     let url = format!("{}/v1/embeddings", resolved.base_url);
     let upstream_headers = build_upstream_headers(&headers, &resolved.api_key);
 

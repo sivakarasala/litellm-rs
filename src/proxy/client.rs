@@ -88,6 +88,9 @@ pub struct ResolvedKey {
     pub api_key: String,
     pub base_url: String,
     pub allowed_models: Option<Vec<String>>,
+    pub rpm_limit: Option<i32>,
+    pub tpm_limit: Option<i32>,
+    pub max_budget_usd: Option<rust_decimal::Decimal>,
 }
 
 /// Validate a virtual key and resolve the provider key for upstream calls.
@@ -101,6 +104,7 @@ pub async fn resolve_key(bearer_token: &str) -> Result<ResolvedKey, AppError> {
     let keys = sqlx::query!(
         r#"SELECT vk.id, vk.key_hash, vk.provider_key_id, vk.is_active,
                   vk.expires_at, vk.allowed_models,
+                  vk.rpm_limit, vk.tpm_limit, vk.max_budget_usd,
                   pk.api_key_encrypted, pk.api_key_nonce, pk.base_url, pk.is_active as provider_active
            FROM virtual_keys vk
            JOIN provider_keys pk ON vk.provider_key_id = pk.id
@@ -134,6 +138,9 @@ pub async fn resolve_key(bearer_token: &str) -> Result<ResolvedKey, AppError> {
                 api_key,
                 base_url: key.base_url,
                 allowed_models: key.allowed_models,
+                rpm_limit: key.rpm_limit,
+                tpm_limit: key.tpm_limit,
+                max_budget_usd: key.max_budget_usd,
             });
         }
     }

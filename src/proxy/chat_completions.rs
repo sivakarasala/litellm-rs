@@ -44,6 +44,26 @@ pub async fn chat_completions(
         }
     }
 
+    // Check rate limits
+    if let Some(rpm_limit) = resolved.rpm_limit {
+        if let Err(msg) =
+            super::rate_limit::rate_limiter().check_rpm(resolved.virtual_key_id, rpm_limit)
+        {
+            return error_response(StatusCode::TOO_MANY_REQUESTS, &msg, "rate_limit_error");
+        }
+    }
+
+    // Check budget
+    if let Some(max_budget) = resolved.max_budget_usd {
+        if let Err(e) = super::budget::check_budget(resolved.virtual_key_id, max_budget).await {
+            return error_response(
+                StatusCode::PAYMENT_REQUIRED,
+                &e.to_string(),
+                "budget_exceeded",
+            );
+        }
+    }
+
     let is_streaming = body.stream.unwrap_or(false);
 
     if is_streaming {

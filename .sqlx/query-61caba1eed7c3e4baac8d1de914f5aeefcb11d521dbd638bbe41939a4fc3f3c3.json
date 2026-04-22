@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COALESCE(SUM(cost_usd), 0) as \"total_cost!: Decimal\"\n           FROM usage_logs\n           WHERE virtual_key_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total_cost!: Decimal",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "61caba1eed7c3e4baac8d1de914f5aeefcb11d521dbd638bbe41939a4fc3f3c3"
+}

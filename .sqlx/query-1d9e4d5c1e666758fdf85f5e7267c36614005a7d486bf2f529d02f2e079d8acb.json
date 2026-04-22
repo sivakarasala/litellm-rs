@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT vk.id, vk.key_hash, vk.provider_key_id, vk.is_active,\n                  vk.expires_at, vk.allowed_models,\n                  pk.api_key_encrypted, pk.api_key_nonce, pk.base_url, pk.is_active as provider_active\n           FROM virtual_keys vk\n           JOIN provider_keys pk ON vk.provider_key_id = pk.id\n           WHERE vk.is_active = true",
+  "query": "SELECT vk.id, vk.key_hash, vk.provider_key_id, vk.is_active,\n                  vk.expires_at, vk.allowed_models,\n                  vk.rpm_limit, vk.tpm_limit, vk.max_budget_usd,\n                  pk.api_key_encrypted, pk.api_key_nonce, pk.base_url, pk.is_active as provider_active\n           FROM virtual_keys vk\n           JOIN provider_keys pk ON vk.provider_key_id = pk.id\n           WHERE vk.is_active = true",
   "describe": {
     "columns": [
       {
@@ -35,21 +35,36 @@
       },
       {
         "ordinal": 6,
+        "name": "rpm_limit",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "tpm_limit",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "max_budget_usd",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 9,
         "name": "api_key_encrypted",
         "type_info": "Bytea"
       },
       {
-        "ordinal": 7,
+        "ordinal": 10,
         "name": "api_key_nonce",
         "type_info": "Bytea"
       },
       {
-        "ordinal": 8,
+        "ordinal": 11,
         "name": "base_url",
         "type_info": "Text"
       },
       {
-        "ordinal": 9,
+        "ordinal": 12,
         "name": "provider_active",
         "type_info": "Bool"
       }
@@ -64,11 +79,14 @@
       false,
       true,
       true,
+      true,
+      true,
+      true,
       false,
       false,
       false,
       false
     ]
   },
-  "hash": "a49f0472f6f9e933554986b7ddc4b7f73303ff2b0acbe91f52a2e9e6d00e1178"
+  "hash": "1d9e4d5c1e666758fdf85f5e7267c36614005a7d486bf2f529d02f2e079d8acb"
 }
