@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO approved_emails\n           (email, display_name, provider_key_id, max_budget_usd,\n            rpm_limit, tpm_limit, default_expiry_hours, created_by)\n           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Uuid",
+        "Numeric",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0d2eb9605bbe8b9a648b13cfb6ef18b3356137f88c048055806c2fb75fb89a62"
+}

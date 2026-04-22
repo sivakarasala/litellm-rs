@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE virtual_keys SET is_active = false, updated_at = now() WHERE user_email = $1 AND is_active = true",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9ff4114f0a2df59d94e598adb749a5e913b97d9d1f70720a87eaec69ebed38a8"
+}

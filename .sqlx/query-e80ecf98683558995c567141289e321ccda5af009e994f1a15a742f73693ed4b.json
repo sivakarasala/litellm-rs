@@ -1,0 +1,74 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, email, display_name, provider_key_id, max_budget_usd,\n                  rpm_limit, tpm_limit, default_expiry_hours, is_active, created_at\n           FROM approved_emails\n           ORDER BY created_at DESC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "provider_key_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "max_budget_usd",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 5,
+        "name": "rpm_limit",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "tpm_limit",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "default_expiry_hours",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "is_active",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "e80ecf98683558995c567141289e321ccda5af009e994f1a15a742f73693ed4b"
+}

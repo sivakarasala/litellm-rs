@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, email, display_name, provider_key_id, max_budget_usd,\n                  rpm_limit, tpm_limit, default_expiry_hours, is_active\n           FROM approved_emails\n           WHERE LOWER(email) = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "provider_key_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "max_budget_usd",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 5,
+        "name": "rpm_limit",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "tpm_limit",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "default_expiry_hours",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "is_active",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "a384248d6d34d19408be350e0d761c76b72fb176181ac3c970130f6aa6d14e1f"
+}

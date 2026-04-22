@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO virtual_keys\n           (key_hash, key_prefix, name, provider_key_id, user_name, user_email,\n            max_budget_usd, rpm_limit, tpm_limit, expires_at)\n           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::timestamptz)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Uuid",
+        "Text",
+        "Text",
+        "Numeric",
+        "Int4",
+        "Int4",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c01982aea74d9dd74b5ab67c611c8917fecee65b4c58e2feb4549bc0c482fa0b"
+}
