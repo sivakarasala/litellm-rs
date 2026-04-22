@@ -1,6 +1,7 @@
 pub mod budget;
 pub mod chat_completions;
 pub mod client;
+pub mod completions;
 pub mod embeddings;
 pub mod models;
 pub mod rate_limit;

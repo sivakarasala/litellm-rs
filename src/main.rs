@@ -69,6 +69,10 @@ async fn main() {
             axum::routing::post(litellm_rs::proxy::chat_completions::chat_completions),
         )
         .route(
+            "/completions",
+            axum::routing::post(litellm_rs::proxy::completions::completions),
+        )
+        .route(
             "/embeddings",
             axum::routing::post(litellm_rs::proxy::embeddings::embeddings),
         )
