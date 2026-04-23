@@ -1,15 +1,13 @@
 [advisories]
-vulnerability = "warn"
 unmaintained = "none"
 yanked = "allow"
-notice = "none"
 ignore = []
 
 [licenses]
-unlicensed = "warn"
 allow = [
     "MIT",
     "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
     "BSD-2-Clause",
     "BSD-3-Clause",
     "ISC",
