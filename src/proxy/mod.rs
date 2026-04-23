@@ -5,6 +5,7 @@ pub mod completions;
 pub mod embeddings;
 pub mod models;
 pub mod rate_limit;
+pub mod responses;
 pub mod token_counter;
 pub mod types;
 pub mod usage;

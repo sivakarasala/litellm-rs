@@ -77,6 +77,10 @@ async fn main() {
             "/embeddings",
             axum::routing::post(litellm_rs::proxy::embeddings::embeddings),
         )
+        .route(
+            "/responses",
+            axum::routing::post(litellm_rs::proxy::responses::responses),
+        )
         .route("/models", get(litellm_rs::proxy::models::list_models))
         .layer(
             CorsLayer::new()

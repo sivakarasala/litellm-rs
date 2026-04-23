@@ -5,6 +5,10 @@ use std::str::FromStr;
 pub fn model_pricing(model: &str) -> (Decimal, Decimal) {
     // Prices per 1M tokens as of 2025
     match model {
+        // GPT-4.1 family
+        m if m.starts_with("gpt-4.1-nano") => (dec("0.10"), dec("0.40")),
+        m if m.starts_with("gpt-4.1-mini") => (dec("0.40"), dec("1.60")),
+        m if m.starts_with("gpt-4.1") => (dec("2.00"), dec("8.00")),
         // GPT-4o family
         m if m.starts_with("gpt-4o-mini") => (dec("0.15"), dec("0.60")),
         m if m.starts_with("gpt-4o") => (dec("2.50"), dec("10.00")),
@@ -13,8 +17,16 @@ pub fn model_pricing(model: &str) -> (Decimal, Decimal) {
         // GPT-4
         m if m.starts_with("gpt-4-32k") => (dec("60.00"), dec("120.00")),
         m if m.starts_with("gpt-4") => (dec("30.00"), dec("60.00")),
+        // GPT-5 family
+        m if m.starts_with("gpt-5-mini") => (dec("1.10"), dec("4.40")),
+        m if m.starts_with("gpt-5") => (dec("10.00"), dec("40.00")),
         // GPT-3.5
         m if m.starts_with("gpt-3.5-turbo") => (dec("0.50"), dec("1.50")),
+        // o4-mini
+        m if m.starts_with("o4-mini") => (dec("1.10"), dec("4.40")),
+        // o3 family
+        m if m.starts_with("o3-mini") => (dec("1.10"), dec("4.40")),
+        m if m.starts_with("o3") => (dec("10.00"), dec("40.00")),
         // o1 family
         m if m.starts_with("o1-mini") => (dec("3.00"), dec("12.00")),
         m if m.starts_with("o1") => (dec("15.00"), dec("60.00")),

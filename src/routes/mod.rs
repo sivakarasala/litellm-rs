@@ -36,6 +36,7 @@ impl Modify for BearerAuth {
         crate::proxy::completions::completions,
         crate::proxy::embeddings::embeddings,
         crate::proxy::models::list_models,
+        crate::proxy::responses::responses,
     ),
     components(schemas(
         ChatCompletionRequest,
