@@ -66,6 +66,14 @@ async fn main() {
     // Proxy routes (OpenAI-compatible)
     let proxy_routes = Router::new()
         .route(
+            "/messages",
+            axum::routing::post(litellm_rs::proxy::anthropic::messages),
+        )
+        .route(
+            "/messages/count_tokens",
+            axum::routing::post(litellm_rs::proxy::anthropic::count_tokens),
+        )
+        .route(
             "/chat/completions",
             axum::routing::post(litellm_rs::proxy::chat_completions::chat_completions),
         )

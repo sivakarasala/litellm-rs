@@ -1,3 +1,4 @@
+pub mod anthropic;
 pub mod budget;
 pub mod chat_completions;
 pub mod client;
