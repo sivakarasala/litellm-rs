@@ -79,10 +79,7 @@ pub async fn messages(headers: HeaderMap, Json(body): Json<Value>) -> Response {
         }
     }
 
-    let is_streaming = body
-        .get("stream")
-        .and_then(Value::as_bool)
-        .unwrap_or(false);
+    let is_streaming = body.get("stream").and_then(Value::as_bool).unwrap_or(false);
 
     if is_streaming {
         handle_streaming(headers, body, resolved).await
@@ -169,11 +166,7 @@ async fn authorize(headers: &HeaderMap, body: &Value) -> Result<ResolvedKey, Res
     Ok(resolved)
 }
 
-async fn handle_non_streaming(
-    headers: HeaderMap,
-    body: Value,
-    resolved: ResolvedKey,
-) -> Response {
+async fn handle_non_streaming(headers: HeaderMap, body: Value, resolved: ResolvedKey) -> Response {
     let url = format!("{}/v1/messages", resolved.base_url);
     let upstream_headers = build_anthropic_headers(&headers, &resolved.api_key);
     let start = std::time::Instant::now();
@@ -513,7 +506,10 @@ mod tests {
     fn anthropic_headers_use_x_api_key() {
         let client_headers = HeaderMap::new();
         let headers = build_anthropic_headers(&client_headers, "sk-ant-test");
-        assert_eq!(headers.get("x-api-key").unwrap().to_str().unwrap(), "sk-ant-test");
+        assert_eq!(
+            headers.get("x-api-key").unwrap().to_str().unwrap(),
+            "sk-ant-test"
+        );
         assert!(headers.get("authorization").is_none());
     }
 
@@ -531,7 +527,10 @@ mod tests {
     fn anthropic_headers_forward_version_and_beta() {
         let mut client_headers = HeaderMap::new();
         client_headers.insert("anthropic-version", "2024-01-01".parse().unwrap());
-        client_headers.insert("anthropic-beta", "prompt-caching-2024-07-31".parse().unwrap());
+        client_headers.insert(
+            "anthropic-beta",
+            "prompt-caching-2024-07-31".parse().unwrap(),
+        );
         let headers = build_anthropic_headers(&client_headers, "sk-ant-test");
         assert_eq!(
             headers.get("anthropic-version").unwrap().to_str().unwrap(),
@@ -546,11 +545,17 @@ mod tests {
     #[test]
     fn anthropic_headers_never_forward_client_auth() {
         let mut client_headers = HeaderMap::new();
-        client_headers.insert("authorization", "Bearer sk-litellm-virtual".parse().unwrap());
+        client_headers.insert(
+            "authorization",
+            "Bearer sk-litellm-virtual".parse().unwrap(),
+        );
         client_headers.insert("x-api-key", "sk-litellm-virtual".parse().unwrap());
         let headers = build_anthropic_headers(&client_headers, "sk-ant-real");
         assert!(headers.get("authorization").is_none());
-        assert_eq!(headers.get("x-api-key").unwrap().to_str().unwrap(), "sk-ant-real");
+        assert_eq!(
+            headers.get("x-api-key").unwrap().to_str().unwrap(),
+            "sk-ant-real"
+        );
     }
 
     #[test]
