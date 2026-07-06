@@ -56,7 +56,7 @@ impl AnthropicUsage {
 pub async fn messages(headers: HeaderMap, Json(body): Json<Value>) -> Response {
     let resolved = match authorize(&headers, &body).await {
         Ok(r) => r,
-        Err(resp) => return resp,
+        Err(resp) => return *resp,
     };
 
     // Check rate limits
@@ -106,7 +106,7 @@ pub async fn messages(headers: HeaderMap, Json(body): Json<Value>) -> Response {
 pub async fn count_tokens(headers: HeaderMap, Json(body): Json<Value>) -> Response {
     let resolved = match authorize(&headers, &body).await {
         Ok(r) => r,
-        Err(resp) => return resp,
+        Err(resp) => return *resp,
     };
 
     let url = format!("{}/v1/messages/count_tokens", resolved.base_url);
@@ -133,33 +133,37 @@ pub async fn count_tokens(headers: HeaderMap, Json(body): Json<Value>) -> Respon
 }
 
 /// Shared auth + model-allowlist gate for both Anthropic endpoints.
-async fn authorize(headers: &HeaderMap, body: &Value) -> Result<ResolvedKey, Response> {
+async fn authorize(headers: &HeaderMap, body: &Value) -> Result<ResolvedKey, Box<Response>> {
     let client_key = match extract_client_key(headers) {
         Ok(k) => k,
         Err((status, msg)) => {
-            return Err(anthropic_error(status, "authentication_error", &msg));
+            return Err(Box::new(anthropic_error(
+                status,
+                "authentication_error",
+                &msg,
+            )));
         }
     };
 
     let resolved = match resolve_key(&client_key).await {
         Ok(r) => r,
         Err(e) => {
-            return Err(anthropic_error(
+            return Err(Box::new(anthropic_error(
                 StatusCode::UNAUTHORIZED,
                 "authentication_error",
                 &e.to_string(),
-            ));
+            )));
         }
     };
 
     if let Some(ref allowed) = resolved.allowed_models {
         let model = body.get("model").and_then(Value::as_str).unwrap_or("");
         if !allowed.iter().any(|m| m == model) {
-            return Err(anthropic_error(
+            return Err(Box::new(anthropic_error(
                 StatusCode::FORBIDDEN,
                 "permission_error",
                 &format!("Model '{}' is not allowed for this key", model),
-            ));
+            )));
         }
     }
 
