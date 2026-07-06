@@ -283,6 +283,11 @@ src/
 | No active provider keys (503) | Add OpenAI key in Settings |
 | Invalid API key (401) | Check key is active and not expired |
 
+## Documentation
+
+- [`docs/presentation/litellm-rs-capability-demo.pdf`](docs/presentation/litellm-rs-capability-demo.pdf) — overview deck: the problem, architecture and trade-offs, live-demo run-sheet, coverage map against the *Designing AI Systems* reference architecture, and roadmap. The [`.pptx` source](docs/presentation/litellm-rs-capability-demo.pptx) includes speaker notes with the full demo script and copy-paste client snippets.
+- [`docs/swagger-samples.md`](docs/swagger-samples.md) — ready-to-paste request bodies for trying every `/v1` endpoint in the deployed Swagger UI (`/api/swagger-ui/`), plus the `utoipa` patch to bake the examples into the spec.
+
 ## License
 
 MIT
