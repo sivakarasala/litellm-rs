@@ -6,6 +6,7 @@ use time::OffsetDateTime;
 use crate::error::AppError;
 
 static HTTP_CLIENT: OnceLock<Client> = OnceLock::new();
+static STREAMING_HTTP_CLIENT: OnceLock<Client> = OnceLock::new();
 
 /// Get or create a shared reqwest client for upstream API calls.
 pub fn http_client() -> &'static Client {
@@ -14,6 +15,20 @@ pub fn http_client() -> &'static Client {
             .timeout(std::time::Duration::from_secs(120))
             .build()
             .expect("Failed to create HTTP client")
+    })
+}
+
+/// Shared client for long-lived requests (e.g. Anthropic Messages streams).
+///
+/// `reqwest`'s `timeout` bounds the entire request including the streamed
+/// body, so a 120s cap would sever long agentic generations mid-stream.
+/// This client only bounds connection establishment.
+pub fn streaming_http_client() -> &'static Client {
+    STREAMING_HTTP_CLIENT.get_or_init(|| {
+        Client::builder()
+            .connect_timeout(std::time::Duration::from_secs(10))
+            .build()
+            .expect("Failed to create streaming HTTP client")
     })
 }
 

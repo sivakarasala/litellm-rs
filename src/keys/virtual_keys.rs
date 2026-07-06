@@ -418,7 +418,7 @@ mod tests {
         let expires = ExpiryDuration::Days30.to_expires_at().unwrap();
         let diff = expires - chrono::Utc::now();
         let days = diff.num_days();
-        assert!(days >= 29 && days <= 30);
+        assert!((29..=30).contains(&days));
     }
 
     // ── ExpiryDuration parsing ──

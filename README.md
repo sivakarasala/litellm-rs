@@ -110,6 +110,27 @@ let config = OpenAIConfig::new()
 let client = Client::with_config(config);
 ```
 
+### Claude Code (Anthropic passthrough)
+
+The gateway exposes the Anthropic Messages API as a transparent passthrough,
+so Claude Code (CLI or VS Code extension) and native Anthropic SDKs can route
+through it. Add a provider key in the dashboard with base URL
+`https://api.anthropic.com` and your real `sk-ant-...` key, create a virtual
+key against it, then point Claude Code at the gateway:
+
+```bash
+export ANTHROPIC_BASE_URL=https://your-gateway.example.com
+export ANTHROPIC_AUTH_TOKEN=sk-litellm-xxx
+claude
+```
+
+Requests are forwarded byte-faithfully (prompt caching `cache_control`
+breakpoints, extended thinking, and tool definitions survive untouched),
+while rate limits, budgets, model allowlists, and usage logging — including
+cache read/write token pricing — apply as with the OpenAI endpoints. Native
+Anthropic SDKs authenticating with `x-api-key: sk-litellm-xxx` are also
+accepted.
+
 ## API Endpoints
 
 ### Proxy (auth: `Authorization: Bearer sk-litellm-xxx`)
@@ -117,6 +138,8 @@ let client = Client::with_config(config);
 | Method | Path | Description |
 |--------|------|-------------|
 | POST | `/v1/chat/completions` | Chat completions (streaming + non-streaming) |
+| POST | `/v1/messages` | Anthropic Messages API passthrough (streaming + non-streaming) |
+| POST | `/v1/messages/count_tokens` | Anthropic token counting passthrough |
 | POST | `/v1/completions` | Legacy completions |
 | POST | `/v1/embeddings` | Text embeddings |
 | GET | `/v1/models` | List available models |

@@ -34,9 +34,55 @@ pub fn model_pricing(model: &str) -> (Decimal, Decimal) {
         m if m.contains("embedding-3-large") => (dec("0.13"), dec("0.00")),
         m if m.contains("embedding-3-small") => (dec("0.02"), dec("0.00")),
         m if m.contains("embedding") => (dec("0.10"), dec("0.00")),
+        // Anthropic Claude family (per 1M tokens, verified July 2026)
+        // Legacy Opus (4.1 and earlier) predates the price cut
+        m if m.starts_with("claude-opus-4-1") => (dec("15.00"), dec("75.00")),
+        m if m.starts_with("claude-opus-4-2") => (dec("15.00"), dec("75.00")),
+        m if m.starts_with("claude-3-opus") => (dec("15.00"), dec("75.00")),
+        // Current Opus generation (4.5+)
+        m if m.starts_with("claude-opus") => (dec("5.00"), dec("25.00")),
+        // Sonnet has held $3/$15 across generations (3.5 through 4.6)
+        m if m.starts_with("claude-sonnet") => (dec("3.00"), dec("15.00")),
+        m if m.starts_with("claude-3-5-sonnet") => (dec("3.00"), dec("15.00")),
+        m if m.starts_with("claude-3-7-sonnet") => (dec("3.00"), dec("15.00")),
+        // Haiku
+        m if m.starts_with("claude-haiku-4") => (dec("1.00"), dec("5.00")),
+        m if m.starts_with("claude-3-5-haiku") => (dec("0.80"), dec("4.00")),
+        m if m.starts_with("claude-3-haiku") => (dec("0.25"), dec("1.25")),
+        m if m.starts_with("claude-haiku") => (dec("1.00"), dec("5.00")),
+        // Conservative fallback for unrecognized Claude models: bill at
+        // the current top published tier so budgets fail safe.
+        m if m.starts_with("claude-") => (dec("10.00"), dec("50.00")),
         // Default fallback
         _ => (dec("1.00"), dec("3.00")),
     }
+}
+
+/// Prompt-cache pricing multipliers relative to base input price.
+/// Cache writes (5-minute TTL) are billed at 1.25x input; cache reads at 0.1x.
+const CACHE_WRITE_MULTIPLIER: &str = "1.25";
+const CACHE_READ_MULTIPLIER: &str = "0.1";
+
+/// Calculate cost in USD including prompt-cache token pricing.
+///
+/// `input_tokens` here means *uncached* input tokens (Anthropic reports
+/// them separately from cache reads/writes in the `usage` object).
+pub fn calculate_cost_with_cache(
+    model: &str,
+    input_tokens: u32,
+    output_tokens: u32,
+    cache_write_tokens: u32,
+    cache_read_tokens: u32,
+) -> Decimal {
+    let (input_price, output_price) = model_pricing(model);
+    let million = dec("1000000");
+    let base = input_price * Decimal::from(input_tokens) / million
+        + output_price * Decimal::from(output_tokens) / million;
+    let cache_write =
+        input_price * dec(CACHE_WRITE_MULTIPLIER) * Decimal::from(cache_write_tokens) / million;
+    let cache_read =
+        input_price * dec(CACHE_READ_MULTIPLIER) * Decimal::from(cache_read_tokens) / million;
+    base + cache_write + cache_read
 }
 
 /// Calculate cost in USD from token counts.
@@ -112,5 +158,59 @@ mod tests {
         // gpt-4o-2024-08-06 should match gpt-4o pricing
         let (input, _) = model_pricing("gpt-4o-2024-08-06");
         assert_eq!(input, dec("2.50"));
+    }
+
+    #[test]
+    fn claude_sonnet_pricing() {
+        let (input, output) = model_pricing("claude-sonnet-4-6");
+        assert_eq!(input, dec("3.00"));
+        assert_eq!(output, dec("15.00"));
+    }
+
+    #[test]
+    fn claude_current_opus_pricing() {
+        let (input, output) = model_pricing("claude-opus-4-8");
+        assert_eq!(input, dec("5.00"));
+        assert_eq!(output, dec("25.00"));
+    }
+
+    #[test]
+    fn claude_legacy_opus_pricing() {
+        let (input, output) = model_pricing("claude-opus-4-1");
+        assert_eq!(input, dec("15.00"));
+        assert_eq!(output, dec("75.00"));
+    }
+
+    #[test]
+    fn claude_haiku_pricing() {
+        let (input, output) = model_pricing("claude-haiku-4-5-20251001");
+        assert_eq!(input, dec("1.00"));
+        assert_eq!(output, dec("5.00"));
+    }
+
+    #[test]
+    fn claude_unknown_falls_back_to_top_tier() {
+        let (input, output) = model_pricing("claude-future-model-9");
+        assert_eq!(input, dec("10.00"));
+        assert_eq!(output, dec("50.00"));
+    }
+
+    #[test]
+    fn cache_cost_calculation() {
+        // Sonnet: 1000 uncached input, 500 output, 2000 cache write, 8000 cache read
+        // input:       3.00/1M * 1000          = 0.003
+        // output:     15.00/1M * 500           = 0.0075
+        // cache write: 3.00 * 1.25/1M * 2000   = 0.0075
+        // cache read:  3.00 * 0.1/1M  * 8000   = 0.0024
+        // total = 0.0204
+        let cost = calculate_cost_with_cache("claude-sonnet-4-6", 1000, 500, 2000, 8000);
+        assert_eq!(cost, dec("0.0204"));
+    }
+
+    #[test]
+    fn cache_cost_without_cache_matches_base() {
+        let with_cache = calculate_cost_with_cache("claude-sonnet-4-6", 1000, 500, 0, 0);
+        let base = calculate_cost("claude-sonnet-4-6", 1000, 500);
+        assert_eq!(with_cache, base);
     }
 }
